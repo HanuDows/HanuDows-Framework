@@ -423,6 +423,39 @@ namespace HanuDowsFramework
             // This will clear and add.
             postManager.PostList = DBHelper.getInstance().LoadPostData(null, null);
         }
+
+        public bool DeletePostFromDB(int postID)
+        {
+            DBQuery query;              // Query Object
+            List<DBQuery> queryList = new List<DBQuery>();
+
+            // Delete Post
+            query = new DBQuery();
+            query.Query = "DELETE FROM Post WHERE Id=?";
+            query.addQueryData(postID);
+            queryList.Add(query);
+
+            // Delete Post Meta
+            query = new DBQuery();
+            query.Query = "DELETE FROM PostMeta WHERE PostId=?";
+            query.addQueryData(postID);
+            queryList.Add(query);
+
+            // Delete Post
+            query = new DBQuery();
+            query.Query = "DELETE FROM Comments WHERE PostId=?";
+            query.addQueryData(postID);
+            queryList.Add(query);
+
+            // Delete Post
+            query = new DBQuery();
+            query.Query = "DELETE FROM Terms WHERE PostId=?";
+            query.addQueryData(postID);
+            queryList.Add(query);
+
+            return DBHelper.getInstance().executeQueries(queryList);
+        }
+
     }
 
 }

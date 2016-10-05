@@ -70,6 +70,8 @@ namespace HanuDowsFramework
             _categories = new List<string>();
             _tags = new List<string>();
             _postComments = new List<PostComment>();
+            _title = _content = "DUMMY";
+            _pubDate = new DateTime();
         }
 
         public void addMetaData(string metaKey, string metaValue)
