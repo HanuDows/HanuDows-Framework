@@ -66,7 +66,8 @@ namespace HanuDowsFramework
                 var success = InitializeForNormalUse();
 
                 // Load Data from DB for Display
-                GetAllPosts();
+                //GetAllPosts();
+                ReadPostsFromDB(false);
             }
 
             RegisterForPushNotificationsAsync();
@@ -418,9 +419,27 @@ namespace HanuDowsFramework
             }
         }
 
-        public void GetAllPosts()
+        public void ReadPostsFromDB(bool batchRead)
         {
-            // This will clear and add.
+            int batchSize = 10;
+            int startPoint = 0;
+
+            if (batchRead)
+            {
+                startPoint = postManager.PostList.Count;
+                postManager.PostList = DBHelper.getInstance().LoadPostData(startPoint, batchSize);
+            }
+            else
+            {
+                postManager.PostList.Clear();
+                postManager.PostList = DBHelper.getInstance().LoadPostData(0, batchSize);
+            }
+        }
+
+        internal void GetAllPosts()
+        {
+            // This will clear and add
+            postManager.PostList.Clear();
             postManager.PostList = DBHelper.getInstance().LoadPostData(null, null);
         }
 

@@ -32,7 +32,6 @@ namespace HanuDowsFramework
             get { return _postList; }
             set
             {
-                _postList.Clear();
                 _postList.AddRange(value);
                 _postList.Sort(Post.CompareByPubDate);
             }

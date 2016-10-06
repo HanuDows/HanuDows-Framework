@@ -177,6 +177,94 @@ namespace HanuDowsFramework
 
         }
 
+        internal List<Post> LoadPostData(int startPoint, int batchSize)
+        {
+            List<Post> postList = new List<Post>();
+
+            string sql = "select * from Post ORDER BY Id DESC LIMIT ? OFFSET ?";
+
+            using (SQLiteConnection dbConn = new SQLiteConnection(dbPath))
+            {
+                ISQLiteStatement statement;
+
+                statement = dbConn.Prepare(sql);
+                statement.Bind(1, batchSize);
+                statement.Bind(2, startPoint);
+
+                while (statement.Step() == SQLiteResult.ROW)
+                {
+                    // Post Data
+                    Post post = new Post();
+                    post.PostID = (int)((long)statement[0]);
+                    post.PubDate = statement[1].ToString();
+                    post.ModDate = statement[2].ToString();
+                    post.PostAuthor = statement[3].ToString();
+                    post.PostTitle = statement[4].ToString();
+                    post.PostContent = statement[5].ToString();
+
+                    // Post Meta Data
+                    sql = "select * from PostMeta where PostId = ?";
+                    using (var metaStatement = dbConn.Prepare(sql))
+                    {
+                        metaStatement.Bind(1, post.PostID);
+                        while (metaStatement.Step() == SQLiteResult.ROW)
+                        {
+                            string metaKey = metaStatement[2].ToString();
+                            string metaVal = metaStatement[3].ToString();
+                            post.addMetaData(metaKey, metaVal);
+                        }
+                    }
+
+                    // Post Comments Data
+                    sql = "select * from Comments where PostId = ? order by CommentId ASC";
+                    using (var commentStatement = dbConn.Prepare(sql))
+                    {
+                        commentStatement.Bind(1, post.PostID);
+                        while (commentStatement.Step() == SQLiteResult.ROW)
+                        {
+                            PostComment comment = new PostComment();
+                            comment.CommentID = (int)commentStatement[0];
+                            comment.PostId = (int)commentStatement[1];
+                            comment.Author = commentStatement[2].ToString();
+                            comment.Email = commentStatement[3].ToString();
+                            comment.CommentDate = commentStatement[4].ToString();
+                            comment.ParentCommentId = (int)commentStatement[5];
+                            comment.Content = commentStatement[6].ToString();
+                            post.addPostcomment(comment);
+                        }
+                    }
+
+                    // Post Terms (Categories and Tags)
+                    sql = "select * from Terms where PostId = ?";
+                    using (var termStatement = dbConn.Prepare(sql))
+                    {
+                        termStatement.Bind(1, post.PostID);
+                        while (termStatement.Step() == SQLiteResult.ROW)
+                        {
+                            string term_taxonomy = termStatement[2].ToString();
+                            string term_name = termStatement[3].ToString();
+                            if (term_taxonomy.Equals("category"))
+                            {
+                                post.addCategory(term_name);
+                            }
+                            if (term_taxonomy.Equals("post_tag"))
+                            {
+                                post.addTag(term_name);
+                            }
+
+                        }
+                    }
+
+                    postList.Add(post);
+                }
+
+                statement.Dispose();
+            }
+
+            return postList;
+            
+        }
+
         internal List<Post> LoadPostData(string taxonomy, string name)
         {
             List<Post> postList = new List<Post>();
