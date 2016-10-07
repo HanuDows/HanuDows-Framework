@@ -223,12 +223,12 @@ namespace HanuDowsFramework
                         while (commentStatement.Step() == SQLiteResult.ROW)
                         {
                             PostComment comment = new PostComment();
-                            comment.CommentID = (int)commentStatement[0];
-                            comment.PostId = (int)commentStatement[1];
+                            comment.CommentID = (int)((long)commentStatement[0]);
+                            comment.PostId = (int)((long)commentStatement[1]);
                             comment.Author = commentStatement[2].ToString();
                             comment.Email = commentStatement[3].ToString();
                             comment.CommentDate = commentStatement[4].ToString();
-                            comment.ParentCommentId = (int)commentStatement[5];
+                            comment.ParentCommentId = (int)((long)commentStatement[5]);
                             comment.Content = commentStatement[6].ToString();
                             post.addPostcomment(comment);
                         }
@@ -330,12 +330,12 @@ namespace HanuDowsFramework
                         while (commentStatement.Step() == SQLiteResult.ROW)
                         {
                             PostComment comment = new PostComment();
-                            comment.CommentID = (int)commentStatement[0];
-                            comment.PostId = (int)commentStatement[1];
+                            comment.CommentID = (int)((long)commentStatement[0]);
+                            comment.PostId = (int)((long)commentStatement[1]);
                             comment.Author = commentStatement[2].ToString();
                             comment.Email = commentStatement[3].ToString();
                             comment.CommentDate = commentStatement[4].ToString();
-                            comment.ParentCommentId = (int)commentStatement[5];
+                            comment.ParentCommentId = (int)((long)commentStatement[5]);
                             comment.Content = commentStatement[6].ToString();
                             post.addPostcomment(comment);
                         }
@@ -387,13 +387,13 @@ namespace HanuDowsFramework
                     while (statement.Step() == SQLiteResult.ROW)
                     {
                         PostArtifact pf = new PostArtifact();
-                        pf.PostID = (int)statement[0];
-                        pf.PubDate = DateTime.Parse((string)statement[1]);
-                        pf.ModDate = DateTime.Parse((string)statement[2]);
+                        pf.PostID = (int)((long)statement[0]);
+                        pf.PubDate = DateTime.Parse(statement[1].ToString());
+                        pf.ModDate = DateTime.Parse(statement[2].ToString());
 
                         try
                         {
-                            pf.CommentDate = DateTime.Parse((string)statement[3]);
+                            pf.CommentDate = DateTime.Parse(statement[3].ToString());
                         }
                         catch
                         {
