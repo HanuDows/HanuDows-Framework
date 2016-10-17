@@ -44,6 +44,7 @@
     <Compile Include="DBHelper.cs" />
     <Compile Include="DBQuery.cs" />
     <Compile Include="HanuDowsApplication.cs" />
+    <Compile Include="ObservablePost.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="PostArtifact.cs" />
     <Compile Include="PostComment.cs" />

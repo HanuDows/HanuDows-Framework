@@ -21,6 +21,7 @@ namespace HanuDowsFramework
 
         private string _blogURL;
         private PostManager postManager;
+        private DBHelper dbHelper;
 
         public string BlogURL
         {
@@ -40,6 +41,7 @@ namespace HanuDowsFramework
         private HanuDowsApplication()
         {
             postManager = PostManager.getInstance();
+            dbHelper = DBHelper.getInstance();
 
             ResourceLoader rl = new ResourceLoader();
             _blogURL = rl.GetString("BlogURL");
@@ -47,8 +49,6 @@ namespace HanuDowsFramework
 
         public async Task<bool> InitializeApplication()
         {
-            // Create DB
-            DBHelper.getInstance();
 
             var localSettings = ApplicationData.Current.LocalSettings;
 
