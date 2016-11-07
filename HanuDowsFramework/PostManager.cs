@@ -94,6 +94,8 @@ namespace HanuDowsFramework
                 lastSyncTime = DateTime.Parse(localSettings.Values["LastSyncTime"].ToString());
             }
 
+            var iid = localSettings.Values["InstanceID"];
+
             TimeSpan interval = now.Subtract(lastSyncTime);
 
             if (interval.Minutes < 5)
@@ -124,6 +126,7 @@ namespace HanuDowsFramework
                 var values = new List<KeyValuePair<string, string>>
                     {
                         new KeyValuePair<string, string>("modified_time", lastSyncTime.ToString("yyyy-MM-dd HH:mm:ss")),
+                        new KeyValuePair<string, string>("iid", iid.ToString()),
                         new KeyValuePair<string, string>("sync_params", sync_params)
                     };
 

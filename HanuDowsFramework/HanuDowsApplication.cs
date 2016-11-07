@@ -87,14 +87,6 @@ namespace HanuDowsFramework
         {
             // Initialize the app for First use
 
-            // Validate Application
-            bool validated = await ValidateApplicationUsage();
-            if (!validated)
-            {
-                // Blog is not valid
-                return false;
-            }
-
             // Load initial data from file
             await LoadInitialDataFromFile();
 
