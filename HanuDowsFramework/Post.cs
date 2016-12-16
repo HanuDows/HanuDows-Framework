@@ -11,13 +11,13 @@ using Windows.Web.Http;
 
 namespace HanuDowsFramework
 {
-    public class Post
+    public sealed class Post
     {
         private int _id;
         private string _author, _title, _content;
         private DateTime _pubDate, _modDate;
         private Dictionary<string, string> _metaData;
-        private List<string> _categories, _tags;
+        internal List<string> _categories, _tags;
         private List<PostComment> _postComments;
 
         public int PostID
@@ -109,7 +109,7 @@ namespace HanuDowsFramework
             int start = 0, end = 0, s = 0, e = 0, index = 0, newStart = 0;
             int counter = 0;
             string subStr = "", replaceStr;
-            string fileName;
+            string fileName, file_extension;
 
             do
             {
@@ -117,22 +117,22 @@ namespace HanuDowsFramework
                 start = _content.IndexOf("<a", newStart);
                 end = _content.IndexOf("</a>", newStart);
 
-                if (start > 0 && end > 0)
+                if (start >= 0 && end > 0)
                 {
-                    subStr = _content.Substring(start, end);
+                    subStr = _content.Substring(start, end-start);
                 }
 
-                if (start > 0 && end > 0 && subStr.Contains("<img"))
+                if (start >= 0 && end > 0 && subStr.Contains("<img"))
                 {
                     // We found something.
-                    replaceStr = subStr = _content.Substring(start, end);
+                    replaceStr = subStr = _content.Substring(start, end-start);
                     s = subStr.IndexOf("src=\"") + 5;
                     e = subStr.IndexOf('"', s);
-                    subStr = subStr.Substring(s, e);    // This is Image URL.
+                    subStr = subStr.Substring(s, e-s);    // This is Image URL.
 
-                    index = subStr.IndexOf(".");
-                    fileName = subStr.Substring(index, index + 4);
-                    fileName = _id + "-" + counter + fileName;
+                    index = subStr.LastIndexOf(".");
+                    file_extension = subStr.Substring(index, 4);
+                    fileName = _id + "-" + counter + file_extension;
 
                     // Download Image.
                     string file = await downloadImage(subStr, fileName);
@@ -294,7 +294,14 @@ namespace HanuDowsFramework
             using (HttpClient hc = new HttpClient())
             {
                 StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
-                StorageFile sampleFile = await storageFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+
+                // Create Images Folder
+                StorageFolder imageFolder = await storageFolder.CreateFolderAsync("images", CreationCollisionOption.OpenIfExists);
+
+                // Create Folder for Post - This is helpful while deleting the post.
+                StorageFolder postFolder = await imageFolder.CreateFolderAsync(_id.ToString(), CreationCollisionOption.OpenIfExists);
+
+                StorageFile sampleFile = await postFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
 
                 Uri uri = new Uri(imageURL);
 
@@ -302,6 +309,22 @@ namespace HanuDowsFramework
                 await FileIO.WriteBufferAsync(sampleFile, buffer);
                 return sampleFile.Name;
             }
+        }
+
+        public bool HasCategory(string category)
+        {
+            bool has_category = false;
+
+            foreach (string cat in _categories)
+            {
+                if (category.Equals(cat))
+                {
+                    has_category = true;
+                    break;
+                }
+            }
+
+            return has_category;
         }
 
         public string getHTMLCode()

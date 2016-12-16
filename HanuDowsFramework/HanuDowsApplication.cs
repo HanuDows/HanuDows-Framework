@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Windows.ApplicationModel;
@@ -49,7 +47,6 @@ namespace HanuDowsFramework
 
         public async Task<bool> InitializeApplication()
         {
-
             var localSettings = ApplicationData.Current.LocalSettings;
 
             if (localSettings.Values["FirstUse"] == null)
@@ -190,7 +187,7 @@ namespace HanuDowsFramework
         private async Task<bool> LoadInitialDataFromFile()
         {
             string default_data_file = @"Assets\DefaultData.xml";
-            StorageFolder InstallationFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+            StorageFolder InstallationFolder = Package.Current.InstalledLocation;
             StorageFile file = await InstallationFolder.GetFileAsync(default_data_file);
 
             using (Stream default_data = await file.OpenStreamForReadAsync())
@@ -428,14 +425,14 @@ namespace HanuDowsFramework
             }
         }
 
-        internal void GetAllPosts()
+        public void GetAllPosts()
         {
             // This will clear and add
             postManager.PostList.Clear();
             postManager.PostList = DBHelper.getInstance().LoadPostData(null, null);
         }
 
-        public bool DeletePostFromDB(int postID)
+        public async Task<bool> DeletePostFromDB(int postID)
         {
             DBQuery query;              // Query Object
             List<DBQuery> queryList = new List<DBQuery>();
@@ -464,7 +461,85 @@ namespace HanuDowsFramework
             query.addQueryData(postID);
             queryList.Add(query);
 
-            return DBHelper.getInstance().executeQueries(queryList);
+            bool result = DBHelper.getInstance().executeQueries(queryList);
+
+            if (result)
+            {
+                // Delete Images
+                try
+                {
+                    StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+                    StorageFolder imageFolder = await storageFolder.GetFolderAsync("images");
+                    StorageFolder postFolder = await imageFolder.GetFolderAsync(postID.ToString());
+                    await postFolder.DeleteAsync();
+                }
+                catch (Exception nofile){}
+                
+            }
+
+            return result;
+        }
+
+        public void AddSyncCategory(string cat)
+        {
+            ApplicationDataContainer _localSettings = ApplicationData.Current.LocalSettings;
+            String oldCat = (String) _localSettings.Values["SyncCategory"];
+
+            if (String.IsNullOrEmpty(oldCat))
+            {
+                oldCat = cat;
+            }
+            else
+            {
+
+                if (oldCat.Contains(cat))
+                {
+                    // Nothing. We already have this category.
+                }
+                else
+                {
+                    oldCat = oldCat + "," + cat;
+                }
+
+            }
+
+            _localSettings.Values["SyncCategory"] = oldCat;
+
+        }
+
+        public void RemoveSyncCategory(string cat)
+        {
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            String oldCat = (String) localSettings.Values["SyncCategory"];
+
+            String newCategories = "";
+
+            if (String.IsNullOrEmpty(oldCat)) { }
+            else
+            {
+
+                string[] oldCategories = oldCat.Split(',');
+
+                foreach (string old_category in oldCategories)
+                {
+
+                    if (cat.Equals(old_category)) { }
+                    else
+                    {
+                        if (newCategories.Equals(""))
+                        {
+                            newCategories = old_category;
+                        }
+                        else
+                        {
+                            newCategories = newCategories + "," + old_category;
+                        }
+
+                    }
+                }
+            }
+
+            localSettings.Values["SyncCategory"] = newCategories;
         }
 
     }

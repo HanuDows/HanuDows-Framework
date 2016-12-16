@@ -7,6 +7,7 @@
         private int index;
 
         private string _postTitle, _postMeta, _postContent;
+        private int _postID;
 
         public static ObservablePost Instance()
         {
@@ -29,10 +30,12 @@
         public string PostTitle { get { return _postTitle; } }
         public string PostMeta { get { return _postMeta; } }
         public string PostContent { get { return _postContent; } }
+        public int PostID { get { return _postID; } }
 
         private void readPost()
         {
             Post post = pm.PostList[index];
+            _postID = post.PostID;
             _postTitle = post.PostTitle;
             _postMeta = "Published On: " + post.PubDate;
             _postContent = post.ShareableContent;
@@ -54,6 +57,12 @@
 
         }
 
+        public bool HasCategory(string category)
+        {
+            Post post = pm.PostList[index];
+            return post.HasCategory(category);
+        }
+        
         public void NextPost()
         {
             if (index == pm.PostList.Count - 1)
