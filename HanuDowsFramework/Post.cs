@@ -166,8 +166,8 @@ namespace HanuDowsFramework
                 query.Query = sql;
 
                 query.addQueryData(_title);
-                query.addQueryData(PubDate);
-                query.addQueryData(ModDate);
+                query.addQueryData(_pubDate);
+                query.addQueryData(_modDate);
                 query.addQueryData(_content);
                 query.addQueryData(_id);
 
@@ -218,8 +218,8 @@ namespace HanuDowsFramework
                 query.Query = sql;
 
                 query.addQueryData(_id);
-                query.addQueryData(PubDate);
-                query.addQueryData(ModDate);
+                query.addQueryData(_pubDate);
+                query.addQueryData(_modDate);
                 query.addQueryData(_author);
                 query.addQueryData(_title);
                 query.addQueryData(_content);

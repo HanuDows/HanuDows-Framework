@@ -181,7 +181,8 @@ namespace HanuDowsFramework
         {
             List<Post> postList = new List<Post>();
 
-            string sql = "select * from Post ORDER BY Id DESC LIMIT ? OFFSET ?";
+            //string sql = "select * from Post ORDER BY Id DESC LIMIT ? OFFSET ?";
+            string sql = "select * from Post ORDER BY PubDate DESC LIMIT ? OFFSET ?";
 
             using (SQLiteConnection dbConn = new SQLiteConnection(dbPath))
             {
